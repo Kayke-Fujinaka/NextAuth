@@ -1,21 +1,24 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useContext, useState } from "react";
 import { Button } from "../components/Button";
 import { Input } from "../components/Input";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function handleSubmi(e: FormEvent) {
+  const { signIn } = useContext(AuthContext);
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     const data = { email, password };
 
-    console.log(data);
+    await signIn(data);
   }
 
   return (
-    <form onSubmit={handleSubmi}>
+    <form onSubmit={handleSubmit}>
       <Input
         type="email"
         name="email"
