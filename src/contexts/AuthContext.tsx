@@ -1,6 +1,7 @@
 import Router from "next/router";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
 import { createContext, ReactNode, useEffect, useState } from "react";
+import { AUTH_REFRESH_TOKEN, AUTH_TOKEN } from "../constants";
 import { api } from "../services/api";
 
 type User = {
@@ -27,8 +28,8 @@ type AuthProviderProps = {
 export const AuthContext = createContext({} as AuthContextData);
 
 export function signOut() {
-  destroyCookie(undefined, "nextauth.token");
-  destroyCookie(undefined, "nextauth.refreshToken");
+  destroyCookie(undefined, AUTH_TOKEN);
+  destroyCookie(undefined, AUTH_REFRESH_TOKEN);
 
   Router.push("/");
 }
@@ -38,7 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAuthenticaded = !!user;
 
   useEffect(() => {
-    const { "nextauth.token": token } = parseCookies();
+    const { AUTH_TOKEN: token } = parseCookies();
 
     if (token) {
       api
@@ -60,12 +61,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const { token, refreshToken, permissions, roles } = response.data;
 
-      setCookie(undefined, "nextauth.token", token, {
+      setCookie(undefined, AUTH_TOKEN, token, {
         maxAge: 60 * 60 * 25 * 30, // 30 days
         path: "/",
       });
 
-      setCookie(undefined, "nextauth.refreshToken", refreshToken, {
+      setCookie(undefined, AUTH_REFRESH_TOKEN, refreshToken, {
         maxAge: 60 * 60 * 25 * 30, // 30 days
         path: "/",
       });
