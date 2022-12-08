@@ -35,7 +35,7 @@ export function signOut() {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User>({} as User);
   const isAuthenticaded = !!user;
 
   useEffect(() => {
@@ -61,6 +61,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       const { token, refreshToken, permissions, roles } = response.data;
 
+      setUser({ email, permissions, roles });
+
       setCookie(undefined, AUTH_TOKEN, token, {
         maxAge: 60 * 60 * 25 * 30, // 30 days
         path: "/",
@@ -70,8 +72,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         maxAge: 60 * 60 * 25 * 30, // 30 days
         path: "/",
       });
-
-      setUser({ email, permissions, roles });
 
       api.defaults.headers["Authorization"] = `Bearer ${token}`;
 

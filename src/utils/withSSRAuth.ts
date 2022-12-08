@@ -3,8 +3,9 @@ import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
 } from "next";
-import { parseCookies } from "nookies";
-import { AUTH_TOKEN } from "../constants";
+import { destroyCookie, parseCookies } from "nookies";
+import { AUTH_REFRESH_TOKEN, AUTH_TOKEN } from "../constants";
+import { AuthTokenError } from "../errors/AuthTokenError";
 
 export function withSSRAuth<P>(fn: GetServerSideProps<P>): GetServerSideProps {
   return async (
@@ -17,12 +18,33 @@ export function withSSRAuth<P>(fn: GetServerSideProps<P>): GetServerSideProps {
     if (!hasCookies) {
       return {
         redirect: {
-          destination: "/dashboard",
+          destination: "/",
           permanent: false,
         },
       };
     }
 
-    return await fn(ctx);
+    try {
+      return await fn(ctx);
+    } catch (error) {
+      if (error instanceof AuthTokenError) {
+        destroyCookie(ctx, AUTH_TOKEN);
+        destroyCookie(ctx, AUTH_REFRESH_TOKEN);
+
+        return {
+          redirect: {
+            destination: "/",
+            permanent: false,
+          },
+        };
+      }
+
+      return {
+        redirect: {
+          destination: `/`,
+          permanent: false,
+        },
+      };
+    }
   };
 }

@@ -74,8 +74,6 @@ export function setupAPIClient(ctx: Context = undefined) {
 
                 if (process.browser) {
                   signOut();
-                } else {
-                  return Promise.reject(new AuthTokenError());
                 }
               })
               .finally(() => {
@@ -96,7 +94,7 @@ export function setupAPIClient(ctx: Context = undefined) {
             });
           });
         } else {
-          signOut();
+          return Promise.reject(new AuthTokenError()).finally();
         }
       }
 
