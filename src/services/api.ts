@@ -7,6 +7,7 @@ import {
   ERROR_TOKEN_EXPIRED,
 } from "../constants";
 import { signOut } from "../contexts/AuthContext";
+import { AuthTokenError } from "../errors/AuthTokenError";
 
 interface AxiosErrorResponse {
   code?: string;
@@ -73,6 +74,8 @@ export function setupAPIClient(ctx: Context = undefined) {
 
                 if (process.browser) {
                   signOut();
+                } else {
+                  return Promise.reject(new AuthTokenError());
                 }
               })
               .finally(() => {
