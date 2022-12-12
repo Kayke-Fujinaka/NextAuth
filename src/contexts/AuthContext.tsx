@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/rules-of-hooks */
 import Router from "next/router";
 import { destroyCookie, parseCookies, setCookie } from "nookies";
 import { createContext, ReactNode, useEffect, useState } from "react";
@@ -17,7 +19,7 @@ type SignInCredentials = {
 
 type AuthContextData = {
   signIn: (credentials: SignInCredentials) => Promise<void>;
-  signOut: () => void;
+  signOut: (broadcast: boolean) => void;
   user: User;
   isAuthenticaded: boolean;
 };
@@ -30,11 +32,11 @@ export const AuthContext = createContext({} as AuthContextData);
 
 let authChannel: BroadcastChannel;
 
-export function signOut() {
+export function signOut(broadcast: boolean = true) {
   destroyCookie(undefined, AUTH_TOKEN);
   destroyCookie(undefined, AUTH_REFRESH_TOKEN);
 
-  authChannel.postMessage("signOut");
+  if (broadcast) authChannel.postMessage("signOut");
 
   Router.push("/");
 }
@@ -49,8 +51,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     authChannel.onmessage = (message) => {
       switch (message.data) {
         case "signOut":
-          signOut();
+          signOut(false);
           break;
+
         default:
           break;
       }

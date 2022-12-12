@@ -18,7 +18,7 @@ export function validateUserPermissions({
   const hasMoreThanOneRole = user.roles?.length > 0;
 
   if (hasMoreThanOnePermission) {
-    const hasAllPermissions = permissions.every((permission) => {
+    const hasAllPermissions = user.permissions.every((permission) => {
       return user.permissions.includes(permission);
     });
 
@@ -26,7 +26,7 @@ export function validateUserPermissions({
   }
 
   if (hasMoreThanOneRole) {
-    const hasAllRoles = roles.every((role) => user.roles.includes(role));
+    const hasAllRoles = user.roles.every((role) => user.roles.includes(role));
 
     if (!hasAllRoles) return false;
   }
